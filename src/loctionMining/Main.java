@@ -1,16 +1,9 @@
 package loctionMining;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.LinkedHashMap;
+import java.util.List;
 
 public class Main {
 
@@ -24,7 +17,7 @@ public class Main {
 		ArrayList<UserLocationRawData> allUsersRawData = new ArrayList<UserLocationRawData>();
 		ArrayList<WeekDayRawData> allUsersWeekRawData = new ArrayList<WeekDayRawData>();
 		for (int i = 2; i <= 106; i++) {
-			String filename = "F:\\locs_" + i + ".txt";
+			String filename = "F:\\activity\\activity_" + i + ".txt";
 			UserLocationRawData user = DataReader.read(filename);
 			if (!user.isEmpty() && user.size() > 40) {
 				System.out.println(filename + " " + user.size());
@@ -33,17 +26,216 @@ public class Main {
 				allUsersWeekRawData.add(tempWeekData);
 			}
 		}
+		for (int userIndex = 0; userIndex < allUsersWeekRawData.size();userIndex++){
+			testActivityData(allUsersWeekRawData, userIndex, Calendar.MONDAY);
+		}
+		
 		// System.out.println(allUsersRawData.size());
 		// System.out.println(allUsersWeekRawData.size());
 		// Calendar cal = Calendar.getInstance();
-		for (int userIndex = 0; userIndex < allUsersWeekRawData.size(); userIndex++) {
-			testOneUser(allUsersWeekRawData, userIndex, Calendar.MONDAY);
-		}
+		// for (int userIndex = 0; userIndex < allUsersWeekRawData.size();
+		// userIndex++) {
+		// testLocation(allUsersWeekRawData, userIndex, Calendar.MONDAY);
+		// }
 		System.out.println("--the end--");
 
 	}
 
-	public static void testOneUser(
+	public static void testActivityData(
+			ArrayList<WeekDayRawData> allUsersWeekRawData, int userIndex,
+			int day) {
+		// ////////////////////////////////split train, v, test data.
+		UserLocationRawData activityTraining = new UserLocationRawData();
+		UserLocationRawData activityValidation = new UserLocationRawData();
+		UserLocationRawData activityTest = new UserLocationRawData();
+		for (int i = 0; i < (allUsersWeekRawData.get(userIndex).week.get(day)
+				.size() - 3); i++) {
+			activityTraining.add(allUsersWeekRawData.get(userIndex).week.get(
+					day).get(i));
+		}
+		for (int j = 0; j < allUsersWeekRawData.size(); j++) {
+			activityValidation.add(allUsersWeekRawData.get(j).week.get(day)
+					.get(allUsersWeekRawData.get(j).week.get(day).size() - 2));
+			activityTest.add(allUsersWeekRawData.get(j).week.get(day).get(
+					allUsersWeekRawData.get(j).week.get(day).size() - 1));
+		}
+		DalyActivityChart activityTrainModel = new DalyActivityChart();
+		// for (LocationRawData ooo:activityTraining.get(0)){
+		// System.out.println("1111111111111111111111");
+		// }
+		for (DayOrderedRawData oneDay : activityTraining) {
+			activityTrainModel = mergeChart(CountChart(oneDay), activityTrainModel);
+		}
+
+		ArrayList<DalyActivityChart> activityValModels = new ArrayList<DalyActivityChart>();
+		for (DayOrderedRawData tempVal : activityValidation) {
+			activityValModels.add(CountChart(tempVal));
+		}
+
+		ArrayList<DalyActivityChart> activityTestModels = new ArrayList<DalyActivityChart>();
+		for (DayOrderedRawData tempTest : activityTest) {
+			activityTestModels.add(CountChart(tempTest));
+		}
+
+		// System.out.println("1111111111111111111111");
+//		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//		for (int i = 0; i < 1440; i++) {
+//			if (trainChart.frequency.get(i) != 0) {
+//				System.out.println(df.format(trainChart.time.get(i)) + ","
+//						+ trainChart.frequency.get(i));
+//			}
+//		}
+/////////////////////////////////////////Set decisionThreshold
+		ArrayList<ArrayList<Double>> activityValscorelist = getActivityScoreList(activityValModels,
+				activityTrainModel);
+		Double closestHigherScore;
+		for (int t = 0; t < 24; t++) {
+			closestHigherScore = 9999999999999.0;
+			for (int i = 0; i < activityValscorelist.size(); i++) {
+				if (closestHigherScore > activityValscorelist.get(i).get(t)
+						&& activityValscorelist.get(userIndex).get(t) < activityValscorelist
+								.get(i).get(t)) {
+					closestHigherScore = activityValscorelist.get(i).get(t);
+				}
+			}
+			// System.out.println(valscorelist.get(userIndex).get(t));
+			decisionThreshold
+					.add((activityValscorelist.get(userIndex).get(t) + closestHigherScore) / 2);
+		}
+	//	 System.out.println(decisionThreshold);
+		// ////////////////////give all score.
+		ArrayList<ArrayList<Double>> testscorelist = getActivityScoreList(activityTestModels,
+				activityTrainModel);
+		Double tp = 0.0;
+		Double fp = 0.0;
+		Double tn = 0.0;
+		Double fn = 0.0;
+		for (int t = 0; t < 24; t++) {
+			for (int i = 0; i < testscorelist.size(); i++) {
+				// System.out.print(testscorelist.get(i));
+				if (i == userIndex) {
+					// System.out.print("this is user it's self");
+					if (testscorelist.get(i).get(t) <= decisionThreshold.get(t)) {
+						tn++;
+					} else {
+						fp++;
+					}
+				} else {
+					if (testscorelist.get(i).get(t) > decisionThreshold.get(t)) {
+						tp++;
+					} else {
+						fn++;
+					}
+				}
+				// System.out.println(" "+(testscorelist.get(i) >=
+				// decisionThreshold?"T":"F"));
+			}
+		}
+		// System.out.println("User " + userIndex + " accuracy is : " + accuracy
+		// / testscorelist.size());
+		// System.out.println("Accurcy:"+ (tn+tp) / testscorelist.size());
+		System.out.println("TPR:	" + tp / (tp + fn) + "	FPR:	" + fp / (fp + tn)
+				+ "	F1:	" + 2 * tp / (2 * tp + fp + fn));
+		// System.out.println("FPR:"+ fp /(fp+tn));
+		// System.out.println("F1:"+ 2*tp /(2*tp+fp+fn));
+		System.out.println(tp + "	" + fn);
+		System.out.println(fp + "	" + tn);
+		System.out
+				.println("//////////////////////////////////////////////////");
+	}
+
+	public static ArrayList<ArrayList<Double>> getActivityScoreList(
+			ArrayList<DalyActivityChart> Models,
+			DalyActivityChart trainModel) {
+		ArrayList<ArrayList<Double>> scorelist = new ArrayList<ArrayList<Double>>();
+		for (DalyActivityChart valModel : Models) {
+			scorelist.add(giveActivityScore(trainModel, valModel));
+		}
+		return scorelist;
+	}
+	public static ArrayList<Double> giveActivityScore(DalyActivityChart train, DalyActivityChart b){
+		ArrayList<Double> returnGAS =new ArrayList<Double>(); 
+		for (int i = 0; i < 24; i++) {
+			returnGAS.add(giveChartScore(train.frequency.subList(60*i, 60*(i+1)),b.frequency.subList(60*i, 60*(i+1))));
+		}
+		return returnGAS;
+	}
+	public static Double giveChartScore(List<Double> a,List<Double> b){
+		Double returnGCS = new Double(0.0);
+		ArrayList<Double> pA = new ArrayList<Double>();
+		ArrayList<Double> pB = new ArrayList<Double>();
+		Double sumA = new Double(0.0);
+		Double sumB = new Double(0.0);
+		for(int i = 0;i<60;i++){
+			pA.add((1.0/60.0)+a.get(i));
+			sumA+=pA.get(i);
+			pB.add((1.0/60.0)+b.get(i));
+			sumB+=pB.get(i);
+		}
+//	System.out.println(sumA+","+sumB);
+		for(int i = 0;i<60;i++){
+			pA.set(i, pA.get(i)/sumA);
+			pB.set(i, pB.get(i)/sumA);
+			returnGCS+=Math.abs((pA.get(i)*Math.log10(pA.get(i)/pB.get(i))));
+		}
+	//	System.out.println(returnGCS);
+		return returnGCS;
+	}
+	
+	public static DalyActivityChart mergeChart(DalyActivityChart a,
+			DalyActivityChart b) {
+		// System.out.println("1111111");
+		DalyActivityChart returnMC = new DalyActivityChart();
+		for (int k = 0; k < 1440; k++) {
+			returnMC.frequency.set(k, a.frequency.get(k) + b.frequency.get(k));
+		}
+		// SimpleDateFormat df=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		// for (int l = 0;l<1440;l++){
+		// if (returnMC.frequency.get(l)!=0){
+		// System.out.println(df.format(returnMC.time.get(l))+","+returnMC.frequency.get(l));
+		// }
+		// }
+		return returnMC;
+	}
+
+	public static DalyActivityChart CountChart(DayOrderedRawData oneDay) {
+		// System.out.println("here");
+		DalyActivityChart returnCC = new DalyActivityChart();
+		Double TempDAC = 0.0;
+		Calendar calCC = Calendar.getInstance();
+		// calCC.setTime(new
+		// SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").parse("2000_01_01_00_00_00"));
+		calCC.setTime(oneDay.get(0).date);
+		calCC.set(2000, 0, 1);
+		for (int i = 0, j = 0; i < 1440;) {
+			if (returnCC.time.get(i).before(calCC.getTime())) {
+				returnCC.frequency.set(i, TempDAC);
+				i++;
+			} else {
+				returnCC.frequency.set(i,
+						TempDAC + Double.parseDouble(oneDay.get(j).loca));
+				TempDAC = Double.parseDouble(oneDay.get(j).loca);
+				if (j != (oneDay.size() - 1)) {
+					j++;
+				} else {
+					TempDAC = 0.0;
+					i++;
+				}
+				calCC.setTime(oneDay.get(j).date);
+				calCC.set(2000, 0, 1);
+			}
+			// System.out.println(df.format(returnCC.time.get(i))+"--"+returnCC.frequency.get(i)+",,"+df.format(oneDay.get(j).date)+"--"+oneDay.get(j).loca);
+		}
+		// SimpleDateFormat df=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		// for (int i = 0;i<1440;i++){
+		// if (returnCC.frequency.get(i)!=0){
+		// System.out.println(df.format(returnCC.time.get(i))+","+returnCC.frequency.get(i));
+		// }
+		// }
+		return returnCC;
+	}
+
+	public static void testLocation(
 			ArrayList<WeekDayRawData> allUsersWeekRawData, int userIndex,
 			int day) {
 		// ////////////////////////////////split train, v, test data.
@@ -95,7 +287,7 @@ public class Main {
 					closestHigherScore = valscorelist.get(i).get(t);
 				}
 			}
-	//		System.out.println(valscorelist.get(userIndex).get(t));
+			// System.out.println(valscorelist.get(userIndex).get(t));
 			decisionThreshold
 					.add((valscorelist.get(userIndex).get(t) + closestHigherScore) / 2);
 		}
@@ -151,18 +343,23 @@ public class Main {
 		}
 		return scorelist;
 	}
-
+/** 
+ * @return abc*/
 	public static ArrayList<Double> giveScore(LocationDecisionModel a,
 			LocationDecisionModel b) {
 		ArrayList<Double> resultGS = new ArrayList<Double>();
 		// double retrunS=0.0;
 		for (int r = 0; r < 24; r++) {
-			resultGS.add(givePatternScore(a.oneDayModel.get(r / 6),
-					b.hourModel.get(r))
-					+ givePatternScore(MinePattern.mergePatternTable(
-							MinePattern.mergePatternTable(a.hourModel.get(r),
-									a.hourModelShift.get(r)), a.hourModelShift
-									.get(r + 1)), b.hourModel.get(r)));
+			resultGS.add(givePatternScore(MinePattern.mergePatternTable(
+					MinePattern.mergePatternTable(a.hourModel.get(r),
+							a.hourModelShift.get(r)), a.hourModelShift
+							.get(r + 1)), b.hourModel.get(r)));
+			// resultGS.add(givePatternScore(a.oneDayModel.get(r / 6),
+			// b.hourModel.get(r))
+			// + givePatternScore(MinePattern.mergePatternTable(
+			// MinePattern.mergePatternTable(a.hourModel.get(r),
+			// a.hourModelShift.get(r)), a.hourModelShift
+			// .get(r + 1)), b.hourModel.get(r)));
 			// retrunS += resultGS.get(r);
 		}
 		return resultGS;
