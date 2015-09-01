@@ -37,7 +37,7 @@ public class DataReader {
 			Calendar cal = Calendar.getInstance();
 			while ((line = br.readLine()) != null) {
 				String[] str = line.split("\t");
-				if (!str[1].equals("00")) {
+				if (!str[1].equals("0")) {
 					Date tempD = convertDate(str[0]);
 					if (tempD != null) {
 						LocationRawData data = new LocationRawData(tempD,

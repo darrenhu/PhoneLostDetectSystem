@@ -9,6 +9,9 @@ public class Pattern {
 		this.locationList = locationList;
 		this.frequency = frequency;
 	}
+	public Pattern(){
+		
+	}
 	@Override
 	public String toString() {
 		return locationList+" "+frequency;

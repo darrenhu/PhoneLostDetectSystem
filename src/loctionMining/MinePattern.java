@@ -132,6 +132,8 @@ public class MinePattern {
 				}
 				if (currentPattern != null && currentPattern.frequency > patternThreshold) {
 					patternTable.add(currentPattern);
+//					System.out.println(currentPattern.locationList);
+//					System.out.println(currentPattern.locationList);
 				}
 				// System.out.println("the level are in " +
 				// nextFatherLoca.loca);
