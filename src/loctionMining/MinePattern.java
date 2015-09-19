@@ -14,7 +14,7 @@ public class MinePattern {
 	public PatternTable patternTable;
 	public int patternSize = 3;
 	public int patternThreshold = 5;
-	public int gapSize = 5;
+	public int gapSize = 2;
 	private ArrayList<DayOrderedRawData> hourlyRawData;
 	private ArrayList<DayOrderedRawData> shiftedHourlyRawData;
 	private ArrayList<DayOrderedRawData> sixHourRawData;
