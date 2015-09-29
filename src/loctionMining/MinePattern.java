@@ -12,9 +12,12 @@ public class MinePattern {
 	private ArrayList<Date> timeTable;
 	private ArrayList<Date> timespar;
 	public PatternTable patternTable;
+//	public int patternSize = 3;
+//	public int patternThreshold = 5;
+//	public int gapSize = 2;
 	public int patternSize = 3;
-	public int patternThreshold = 5;
-	public int gapSize = 2;
+	public int patternThreshold = 1;
+	public int gapSize = 1;
 	private ArrayList<DayOrderedRawData> hourlyRawData;
 	private ArrayList<DayOrderedRawData> shiftedHourlyRawData;
 	private ArrayList<DayOrderedRawData> sixHourRawData;

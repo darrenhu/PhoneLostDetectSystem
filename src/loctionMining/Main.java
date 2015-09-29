@@ -7,9 +7,13 @@ import java.util.List;
 
 public class Main {
 
-	public static int gapSize = 5;
+//	public static int gapSize = 5;
+//	public static int patternSize = 3;
+//	public static int patternThreshold = 5;
+//	public static ArrayList<Double> decisionThreshold = new ArrayList<Double>();
+	public static int gapSize = 1;
 	public static int patternSize = 3;
-	public static int patternThreshold = 5;
+	public static int patternThreshold = 1;
 	public static ArrayList<Double> decisionThreshold = new ArrayList<Double>();
 
 	public static void main(String[] arges) {
@@ -18,6 +22,7 @@ public class Main {
 		ArrayList<WeekDayRawData> allUsersWeekRawData = new ArrayList<WeekDayRawData>();
 		for (int i = 2; i <= 106; i++) {
 			String filename = "F:\\locs\\locs_" + i + ".txt";
+//			String filename = "F:\\app\\app_" + i + ".txt";
 			//String filename = "F:\\activity\\activity_" + i + ".txt";
 			UserLocationRawData user = DataReader.read(filename);
 			if (!user.isEmpty() && user.size() > 120) {
@@ -412,16 +417,25 @@ public class Main {
 			kcScoreList.add(tempList);
 			// kcScoreList.add(giveScore(tempKC, trainModels.get(i)));
 		}
-		for (int i = 0; i < 22; i++) {
+		
+		ArrayList<Double> kcScoreMax = new ArrayList<Double>();
+		
+		for (int i = 0; i < 24; i++) {
 			Double sum = new Double(0.0);
+			Double max = new Double(0.0);
 			for (int j = 0; j < kcScoreList.size(); j++) {
 				sum += kcScoreList.get(j).get(i);
 				// System.out.println(i + " , " + " score "+
 				// kcScoreList.get(j).get(i));
+				if (max<kcScoreList.get(j).get(i)&& kcScoreList.get(j).get(i)<1.0){
+					max = kcScoreList.get(j).get(i);
+				}
 			}
 			// System.out.println((sum / kcScoreList.size()));
 			kcScore.add(sum / kcScoreList.size());
+			kcScoreMax.add(max);
 		}
+		
 		// for (int i = 0; i < 24; i++) {
 		// Double sum = new Double(0.0);
 		// Integer size =new Integer(0);
@@ -452,7 +466,7 @@ public class Main {
 
 		Double closestHigherScore;
 		Double closestLowerScore;
-		for (int t = 0; t < 22; t++) {
+		for (int t = 0; t < 24; t++) {
 			// closestHigherScore = 0.0;
 			// for (int i = 0; i < valscorelist.size(); i++) {
 			// if (closestHigherScore < valscorelist.get(i).get(t)
@@ -460,7 +474,7 @@ public class Main {
 			// closestHigherScore = valscorelist.get(i).get(t);
 			// }
 			// }
-
+		//decisionThreshold.add(kcScoreMax.get(t));
 			closestLowerScore = 9999999999.0;
 			for (int i = 0; i < valscorelist.size(); i++) {
 				if (closestLowerScore > valscorelist.get(i).get(t)
@@ -511,7 +525,7 @@ public class Main {
 		Double fp = 0.0;
 		Double tn = 0.0;
 		Double fn = 0.0;
-		for (int t = 0; t < 22; t++) {
+		for (int t = 0; t < 24; t++) {
 			for (int i = 0; i < testscorelist.size(); i++) {
 				// System.out.print(testscorelist.get(i));
 				if (i == userIndex) {
@@ -547,8 +561,8 @@ public class Main {
 		Double fp1 = 0.0;
 		Double tn1 = 0.0;
 		Double fn1 = 0.0;
-		for (int t = 0; t < 22; t++) {
-			if (testscorelist.get(userIndex).get(t) != 6.0) {
+		for (int t = 0; t < 24; t++) {
+			if (testscorelist.get(userIndex).get(t) != 1.0) {
 				for (int i = 0; i < testscorelist.size(); i++) {
 					// System.out.print(testscorelist.get(i));
 					if (i == userIndex) {
@@ -624,7 +638,7 @@ public class Main {
 		for (int r = 2; r < 24; r++) {
 			resultGS1.add((3 * resultGS.get(r)) + (2 * resultGS.get(r - 1))+ resultGS.get(r - 2));
 		}
-		return resultGS1;
+		return resultGS;
 	}
 
 	// public static double givePatternScore(PatternTable training, PatternTable
