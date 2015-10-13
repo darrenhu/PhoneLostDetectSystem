@@ -65,6 +65,10 @@ public class MinePattern {
 			dFS(new ArrayList<String>(), allLocations, 1);
 			locationDecisionModel.oneDayModel.add(patternTable);
 		}
+		for(String lo: findAllLocation(rawdata).keySet()){
+			locationDecisionModel.locs.add(lo);
+		}
+//		System.out.println(locationDecisionModel.locs.size());
 		return locationDecisionModel;
 	}
 	public void setTimeTable(DayOrderedRawData rawdata){

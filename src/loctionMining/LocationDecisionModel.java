@@ -1,11 +1,13 @@
 package loctionMining;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 public class LocationDecisionModel {
 	ArrayList<PatternTable> hourModel;
 	ArrayList<PatternTable> hourModelShift;
 	ArrayList<PatternTable> oneDayModel;
+	HashSet<String> locs = new HashSet<String>();
 	public LocationDecisionModel() {
 		super();
 		this.hourModel = new ArrayList<PatternTable>();

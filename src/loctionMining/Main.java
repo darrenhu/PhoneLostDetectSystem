@@ -3,6 +3,7 @@ package loctionMining;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.List;
 
 public class Main {
@@ -478,16 +479,16 @@ public class Main {
 			closestLowerScore = 9999999999.0;
 			for (int i = 0; i < valscorelist.size(); i++) {
 				if (closestLowerScore > valscorelist.get(i).get(t)
-						&& kcScore.get(t) < valscorelist.get(i).get(t)) {
+						&& kcScoreMax.get(t) < valscorelist.get(i).get(t)) {
 					closestLowerScore = valscorelist.get(i).get(t);
 				}
 			}
 			if (closestLowerScore == 9999999999.0) {
-				closestLowerScore = kcScore.get(t);
+				closestLowerScore = kcScoreMax.get(t);
 			}
 			// System.out.println(valscorelist.get(userIndex).get(t));
 			// System.out.println(valscorelist.get(userIndex).get(t)+",,,,,,,,,"+closestHigherScore);
-			decisionThreshold.add((kcScore.get(t) + closestLowerScore) / 2);
+			decisionThreshold.add((kcScoreMax.get(t) + closestLowerScore) / 2);
 			// System.out.println(t+"   ,   "+decisionThreshold.size()+"   ,   "+decisionThreshold.get(t));
 		}
 
@@ -498,27 +499,27 @@ public class Main {
 		ArrayList<ArrayList<Double>> testscorelist = getScoreList(testModels,
 				evenlyTrainModel);
 		// /////////////////////////////////////////////////////////////////////
-		// ArrayList<Double> valSort;
-		// ArrayList<Double> testSort;
-		// for (int t = 6; t < 19; t++) {
-		// valSort = new ArrayList<Double>();
-		// testSort = new ArrayList<Double>();
-		// for (int i = 0; i < valscorelist.size(); i++) {
-		// valSort.add(valscorelist.get(i).get(t));
-		// testSort.add(testscorelist.get(i).get(t));
-		// }testSort.add(testscorelist.get(valscorelist.size()).get(t));
-		//
-		// //valSort.sort(null);
-		// //testSort.sort(null);
-		// System.out.println("---------------"+ t +"----------------");
-		// System.out.println("Threshold :	" + decisionThreshold.get(t));
-		// System.out.println("Valation :" + kcScore.get(t));
-		// System.out.println(valSort);
-		// System.out.println("Test :" + testscorelist.get(userIndex).get(t));
-		// System.out.println(testSort);
-		// System.out.println("-------------------------------");
-		// System.out.println("-------------------------------");
-		// }
+//		 ArrayList<Double> valSort;
+//		 ArrayList<Double> testSort;
+//		 for (int t = 6; t < 19; t++) {
+//		 valSort = new ArrayList<Double>();
+//		 testSort = new ArrayList<Double>();
+//		 for (int i = 0; i < valscorelist.size(); i++) {
+//		 valSort.add(valscorelist.get(i).get(t));
+//		 testSort.add(testscorelist.get(i).get(t));
+//		 }testSort.add(testscorelist.get(valscorelist.size()).get(t));
+//		
+//		 //valSort.sort(null);
+//		 //testSort.sort(null);
+//		 System.out.println("---------------"+ t +"----------------");
+//		 System.out.println("Threshold :	" + decisionThreshold.get(t));
+//		 System.out.println("Valation :" + kcScore.get(t));
+//		 System.out.println(valSort);
+//		 System.out.println("Test :" + testscorelist.get(userIndex).get(t));
+//		 System.out.println(testSort);
+//		 System.out.println("-------------------------------");
+//		 System.out.println("-------------------------------");
+//		 }
 		// ////////////////////////////////////////////////////////////////////
 
 		Double tp = 0.0;
@@ -546,17 +547,6 @@ public class Main {
 				// decisionThreshold?"T":"F"));
 			}
 		}
-		// System.out.println("User " + userIndex + " accuracy is : " + accuracy
-		// / testscorelist.size());
-		// System.out.println("Accurcy:"+ (tn+tp) / testscorelist.size());
-		// System.out.println("TPR:	" + tp / (tp + fn) + "	FPR:	" + fp / (fp +
-		// tn)
-		// + "	F1:	" + 2 * tp / (2 * tp + fp + fn) + " Tp: " + tp
-		// + " Fn: " + fn + " Fp: " + fp + " Tn: " + tn);
-		// System.out.println("FPR:"+ fp /(fp+tn));
-		// System.out.println("F1:"+ 2*tp /(2*tp+fp+fn));
-		// System.out.println(tp + "	" + fn);
-		// System.out.println(fp + "	" + tn);
 		Double tp1 = 0.0;
 		Double fp1 = 0.0;
 		Double tn1 = 0.0;
@@ -593,6 +583,101 @@ public class Main {
 				+ " Tp1: " + tp1 + " Fn1: " + fn1 + " Fp1: " + fp1 + " Tn1: "
 				+ tn1);
 		// System.out.println("//////////////////////////////////////////////////");
+	
+//	ArrayList<Double> tp = new ArrayList<Double>();
+//	Double fp = 0.0;
+//	Double tn = 0.0;
+//	ArrayList<Double> fn  = new ArrayList<Double>();
+//	Double tempTp;
+//	Double tempFn;
+//	for (int i = 0; i < testscorelist.size(); i++) {
+//		tempTp = 0.0;
+//		tempFn = 0.0;
+//		for (int t = 0; t < 24; t++) {
+//			// System.out.print(testscorelist.get(i));
+//			if (i == userIndex) {
+//				// System.out.print("this is user it's self");
+//				if (testscorelist.get(i).get(t) <= decisionThreshold.get(t)) {
+//					tn++;
+//				} else {
+//					fp++;
+//				}
+//			} else {
+//				if (testscorelist.get(i).get(t) > decisionThreshold.get(t)) {
+//					tempTp++;
+//				} else {
+//					tempFn++;
+//				}
+//			}
+//			// System.out.println(" "+(testscorelist.get(i) >=
+//			// decisionThreshold?"T":"F"));
+//		}
+//		if (i != userIndex) {
+//			tp.add(tempTp);
+//			fn.add(tempFn);
+//		}
+//	}
+//	ArrayList<Double> tp1 = new ArrayList<Double>();
+//	Double fp1 = 0.0;
+//	Double tn1 = 0.0;
+//	ArrayList<Double> fn1  = new ArrayList<Double>();
+//	Double tempTp1;
+//	Double tempFn1;
+//	for (int i = 0; i < testscorelist.size(); i++) {
+//		tempTp1 = 0.0;
+//		tempFn1 = 0.0;
+//		for (int t = 0; t < 24; t++) {
+//			if (testscorelist.get(userIndex).get(t) != 1.0) {
+//				// System.out.print(testscorelist.get(i));
+//				if (i == userIndex) {
+//					// System.out.print("this is user it's self");
+//					if (testscorelist.get(i).get(t) <= decisionThreshold
+//							.get(t)) {
+//						tn1++;
+//					} else {
+//						fp1++;
+//					}
+//				} else {
+//					if (testscorelist.get(i).get(t) > decisionThreshold
+//							.get(t)) {
+//						tempTp1++;
+//					} else {
+//						tempFn1++;
+//					}
+//				}
+//				// System.out.println(" "+(testscorelist.get(i) >=
+//				// decisionThreshold?"T":"F"));
+//			}
+//		}
+//		if (i != userIndex) {
+//			tp1.add(tempTp1);
+//			fn1.add(tempFn1);
+//		}
+//	}
+//	// System.out.println("Accurcy:"+ (tn+tp) / testscorelist.size());
+//	Double sumOfTPR = 0.0;
+//	Double sumOfTPR1 = 0.0;
+//	Double sumOfTP = 0.0;
+//	Double sumOfTP1 = 0.0;
+//	Double tempeq = 0.0;
+//	Double tempeq1 = 0.0;
+//	for (int i = 0; i < tp.size(); i++) {
+////		System.out.print("	,	"+tp.get(i)/(tp.get(i)+fn.get(i)));
+//		sumOfTPR += tp.get(i)/(tp.get(i)+fn.get(i));
+//		tempeq += fp/tp.get(i);
+//		sumOfTP += tp.get(i);
+//	}
+////	System.out.println("");
+//	for (int i = 0; i < tp1.size(); i++) {
+////		System.out.print("	,	"+tp1.get(i)/(tp1.get(i)+fn1.get(i)));
+//		sumOfTPR1 += tp1.get(i)/(tp1.get(i)+fn1.get(i));
+//		tempeq1 += fp1/tp1.get(i);
+//		sumOfTP1 += tp1.get(i);
+//	}
+////	System.out.println("");	
+//	System.out.println("TPR:	" + sumOfTPR/tp.size() + "	,	" + sumOfTPR1/tp1.size()
+//			+ "	FPR:	" + fp / (fp + tn) + "	,	" + fp1 / (fp1 + tn1) + "	fp/tp:	" + tempeq/tp.size()+ "	,	" + tempeq1/tp1.size()+ "	fp1/tp total:	" + (tempeq*tp.size())/sumOfTP+ "	,	" + (tempeq1*tp1.size())/sumOfTP1);
+//	
 	}
 
 	public static ArrayList<ArrayList<Double>> getScoreList(
@@ -625,7 +710,7 @@ public class Main {
 			resultGS.add(givePatternScore(MinePattern.mergePatternTable(
 					MinePattern.mergePatternTable(a.hourModel.get(r),
 							a.hourModelShift.get(r)), a.hourModelShift
-							.get(r + 1)), b.hourModel.get(r)));
+							.get(r + 1)), b.hourModel.get(r), a.locs, b.locs));
 			// resultGS.add(givePatternScore(a.oneDayModel.get(r / 6),
 			// b.hourModel.get(r))
 			// + givePatternScore(MinePattern.mergePatternTable(
@@ -702,7 +787,7 @@ public class Main {
 	// if (b.patternMap.size() == 0){return 1;}
 	// else{return score/2;}
 	// }
-	public static double givePatternScore(PatternTable training, PatternTable b) {
+	public static double givePatternScore(PatternTable training, PatternTable b, HashSet ths, HashSet hs) {
 		Double score = new Double(0.0);
 		Double sumOfPattern = new Double(0.0);
 		for (Pattern x : training.patternMap.values()) {
@@ -728,7 +813,21 @@ public class Main {
 		// System.out.println("training: "+training.patternMap.size()+"  test: "+
 		// b.patternMap.size()+" score: "+score);
 		// System.out.println(sumOfPattern+" , "+training.patternMap.size()+" , "+b.patternMap.size()+" , "+score/sumOfPattern);
-		return score / sumOfPattern;
+		if (hs.size()!= 0 && ths.size()!=0){
+			return (score / sumOfPattern) / (hs.size() /ths.size());
+		}else{
+			return (score / sumOfPattern);
+		}
+//		return score / sumOfPattern;
+//		System.out.println(score/ hs.size());
+//		System.out.println(score);
+//		System.out.println(hs.size());
+//		if (hs.size()!= 0 && ths.size()!=0){
+//			return score / (hs.size() /ths.size());
+//		}else{
+//			return score;
+//		}
+//		return score ;
 	}
 
 	// public static double givePatternScore(PatternTable training, PatternTable
