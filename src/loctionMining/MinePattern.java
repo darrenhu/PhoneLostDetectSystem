@@ -3,11 +3,12 @@ package loctionMining;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-
+// change location type from String to int.
 public class MinePattern {
 	private ArrayList<Date> timeTable;
 	private ArrayList<Date> timespar;
@@ -172,8 +173,8 @@ public class MinePattern {
 		Pattern retrunPattern = new Pattern(templist.toString(), result.cardinality());
 	//	System.out.println(result.cardinality());
 		return retrunPattern;
-		
 	}
+	
 	public BitSet mergeBitSet(List<BitSet> bitSetList){
 		List<BitSet> temp = new LinkedList<BitSet>();
 		for(int m = 0;m < bitSetList.size();m++){
@@ -274,6 +275,10 @@ public class MinePattern {
 		for (int q = 0; q< 5;q++){
 			resultMDM.oneDayModel.add(mergePatternTable(a.oneDayModel.get(q),b.oneDayModel.get(q)));
 		}
+//		a.locs.addAll(b.locs);
+		//System.out.println("1111111111111"+a.locs.size()+" , "+b.locs.size());
+		resultMDM.locs.addAll(a.locs);
+		resultMDM.locs.addAll(b.locs);
 		return resultMDM;
 	}
 	public static PatternTable mergePatternTable(PatternTable a, PatternTable b) {
