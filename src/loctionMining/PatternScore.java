@@ -96,6 +96,7 @@ public class PatternScore implements Comparable<PatternScore> {
 			return (1- (((this.sumcase1ferq/this.sumOfPatternT)+(this.sumcase1ferq/this.sumOfPatternO))/2.0));
 		}
 	}
+	
 	public Double toDouble3() {
 		if (this.sumOfPatternT==0 || this.sumOfPatternO==0){
 			return 2.0;//(score/sumOfPattern)/ (hs.size() /ths.size());

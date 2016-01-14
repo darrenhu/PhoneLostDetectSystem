@@ -67,6 +67,15 @@ public class Main {
 				allUsersWeekRawData.add(tempWeekData);
 			}
 		}
+		
+//		System.out.println("HMM");
+//		LocationHMM.locatinoHMM(allUsersWeekRawData, 4, Calendar.MONDAY);
+		
+		for (int userIndex = 0; userIndex < allUsersWeekRawData.size();
+				 userIndex++) {
+			LocationHMM.locatinoHMM(allUsersWeekRawData, userIndex, Calendar.MONDAY);
+		}
+		
 //		for (int userIndex = 0; userIndex < allUsersWeekRawData.size(); userIndex++) {
 //			testActivityData(allUsersWeekRawData, userIndex, Calendar.MONDAY);
 //		}
@@ -74,11 +83,13 @@ public class Main {
 		// System.out.println(allUsersRawData.size());
 		// System.out.println(allUsersWeekRawData.size());
 		// Calendar cal = Calendar.getInstance();
-		 System.out.println("MONDAY");
-		 for (int userIndex = 0; userIndex < allUsersWeekRawData.size();
-		 userIndex++) {
-		 testLocation(allUsersWeekRawData, userIndex, Calendar.MONDAY);
-		 }
+
+		
+//		 System.out.println("MONDAY");
+//		 for (int userIndex = 0; userIndex < allUsersWeekRawData.size();
+//		 userIndex++) {
+//			 testLocation(allUsersWeekRawData, userIndex, Calendar.MONDAY);
+//		 }
 //		 System.out.println("TUESDAY");
 //		 for (int userIndex = 0; userIndex < allUsersWeekRawData.size();
 //		 userIndex++) {
@@ -481,23 +492,6 @@ System.out.println("--the end--");
 		double upr = 0.0;
 		double unr = 0.0;
 		double tcompare = 0.0;
-//////////////////////////////////////test HMM //////////////////////////////////////////////////
-//		List<List<String>> trainHMM = new ArrayList<List<String>>();
-//		List<String> oneSequence;
-//		System.out.println(userData.size());
-//		for (int i = 0;i<userData.size();i++){
-//			oneSequence = new ArrayList<String>();
-//			for(int j = 0;j<Math.min(userData.get(i).size(),10);j++){
-//				oneSequence.add(userData.get(i).get(j).loca);
-//			//	System.out.println(userData.get(i).get(j).loca);
-//			}
-//			trainHMM.add(oneSequence);
-//			
-//		}TempJava.buildHmm(trainHMM, 2);
-//		
-//		System.out.println("end");
-//	System.exit(0);	
-		
 ///////////////////// transform raw data to BitSet,and mine all data ////////////////////////////
 		MinePattern miner = new MinePattern();
 		ArrayList<LocationDecisionModel> userModels = new ArrayList<LocationDecisionModel>();
@@ -516,13 +510,30 @@ System.out.println("--the end--");
 		
 		int totleData = allUsersWeekRawData.get(userIndex).week.get(day).size();
 		LinkedHashSet index;
-		ArrayList<resultList> allResults = new ArrayList<resultList>();
-		ArrayList<Double> bestResult = new ArrayList<Double>();
-		for(int i = 0;i<12;i++){
-			bestResult.add(1.0);
+//		ArrayList<resultList> allResults = new ArrayList<resultList>();
+//		ArrayList<Double> bestResult = new ArrayList<Double>();
+//		for(int i = 0;i<12;i++){
+//			bestResult.add(1.0);
+//		}
+		ArrayList<Double> results = new ArrayList<Double>();
+		for(int i = 0; i<17 ;i++){
+			results.add(0.0);
 		}
+		ArrayList<Roc> scase1 = new ArrayList<Roc>();
+		ArrayList<Roc> score1 = new ArrayList<Roc>();
+		ArrayList<Roc> score2 = new ArrayList<Roc>();
+		for (int j = 0 ; j<10 ; j++){
+			scase1.add(new Roc(0.0 , 0.0));
+			score1.add(new Roc(0.0 , 0.0));
+			score2.add(new Roc(0.0 , 0.0));
+		}
+		
+		ArrayList<ResultsTandF> strategy1 = new ArrayList<ResultsTandF>();
+		ArrayList<ResultsTandF> strategy2 = new ArrayList<ResultsTandF>();
+		ArrayList<ResultsTandF> strategy3 = new ArrayList<ResultsTandF>();
+		ArrayList<ResultsTandF> strategy4 = new ArrayList<ResultsTandF>();
 		for (int i = 0; i<100; i++){
-			ArrayList<Double> tempresult = new ArrayList<Double>();
+			ArrayList<ArrayList<Double>> tempresult = new ArrayList<ArrayList<Double>>();
 			ArrayList<LocationDecisionModel> trainModels = new ArrayList<LocationDecisionModel>();
 			ArrayList<LocationDecisionModel> testUserModels = new ArrayList<LocationDecisionModel>();
 			index = new LinkedHashSet();
@@ -537,60 +548,138 @@ System.out.println("--the end--");
 					trainModels.add(userModels.get(j));
 				}
 			}
+			
 			tempresult = evaluateLocationModel(trainModels,valModels,testModels,testUserModels);
-			resultList temprl = new resultList(tempresult);
-			allResults.add(temprl);
-			if (tempresult.get(1)==bestResult.get(1)){
-				if(tempresult.get(0)>bestResult.get(0)){
-					bestResult = tempresult;
+			strategy1.add(new ResultsTandF (tempresult.get(0).get(0),tempresult.get(0).get(1)));
+//			results.set(0, results.get(0)+tempresult.get(0).get(0));
+//			results.set(1, results.get(1)+tempresult.get(0).get(1));
+			results.set(2, results.get(2)+tempresult.get(0).get(2));
+			
+			strategy2.add(new ResultsTandF (tempresult.get(1).get(0),tempresult.get(1).get(1)));
+//			results.set(3, results.get(3)+tempresult.get(1).get(0));
+//			results.set(4, results.get(4)+tempresult.get(1).get(1));
+			results.set(5, results.get(5)+tempresult.get(1).get(2));
+			
+			strategy3.add(new ResultsTandF (tempresult.get(2).get(0),tempresult.get(2).get(1)));
+//			results.set(6, results.get(6)+tempresult.get(2).get(0));
+//			results.set(7, results.get(7)+tempresult.get(2).get(1));
+			results.set(8, results.get(8)+tempresult.get(2).get(2));
+			results.set(9, results.get(9)+tempresult.get(2).get(3));
+			
+			strategy4.add(new ResultsTandF (tempresult.get(3).get(0),tempresult.get(3).get(1)));
+//			results.set(10, results.get(10)+tempresult.get(3).get(0));
+//			results.set(11, results.get(11)+tempresult.get(3).get(1));
+			results.set(12, results.get(12)+tempresult.get(3).get(2));
+			results.set(13, results.get(13)+tempresult.get(3).get(3));
+			
+			results.set(14, results.get(14)+tempresult.get(3).get(4));
+			results.set(15, results.get(15)+tempresult.get(3).get(5));
+			results.set(16, results.get(16)+tempresult.get(3).get(6));
+			
+			for (int j = 0 ; j<10 ; j++){
+//				System.out.println(tempresult.get(4).get(j));
+				if (tempresult.get(4).get(j) != 0){
+					scase1.set(j, new Roc((scase1.get(j).counter + 1), (scase1.get(j).scores+tempresult.get(4).get(j))));
 				}
-				if(tempresult.get(0)==bestResult.get(0)&& (int)(tempresult.get(6)+tempresult.get(7))>(int)(bestResult.get(6)+bestResult.get(7))){
-					bestResult = tempresult;
+				if (tempresult.get(5).get(j) != 0){
+					score1.set(j, new Roc((score1.get(j).counter + 1), (score1.get(j).scores+tempresult.get(5).get(j))));
+				}
+				if (tempresult.get(6).get(j) != 0){
+					score2.set(j, new Roc((score2.get(j).counter + 1), (score2.get(j).scores+tempresult.get(6).get(j))));
 				}
 			}
-			if (tempresult.get(1)<bestResult.get(1)){
-				bestResult = tempresult;
-			}
-			p1+=tempresult.get(8);
-			p2+=tempresult.get(9);
-			p3+=tempresult.get(10);
-			p4+=tempresult.get(11);
-			p5+=tempresult.get(12);
-			p6+=tempresult.get(13);
-			tcompare+=tempresult.get(15);
-//			p7+=tempresult.get(14);
-//			p8+=tempresult.get(15);
 		}
-		Collections.sort(allResults);
-		resultList avgResult = new resultList();
-		Double avgTPR = 0.0;
-		Double avgFPR = 0.0;
-		Double goodData = 0.0;
-		Double allData = 0.0;
+		ArrayList<Double> showTandF = new ArrayList<Double>();
+		for(int i = 0; i<8; i++){
+			showTandF.add(0.0);
+		}
+		Collections.sort(strategy1);Collections.sort(strategy2);Collections.sort(strategy3);Collections.sort(strategy4);
 		for(int i = 0; i<50; i++){
-		//	System.out.println("tp: "+allResults.get(i).results.get(1));
-//			System.out.println("fp: "+allResults.get(i).results.get(3));
-				//avgResult.results.set(j, (avgResult.results.get(j)+allResults.get(i).results.get(j)));
-			avgTPR += allResults.get(i).results.get(0);
-			avgFPR += allResults.get(i).results.get(1);
-//			System.out.println("good "+(allResults.get(i).results.get(10)+allResults.get(i).results.get(11))+"total: "+allResults.get(i).results.get(10)+allResults.get(i).results.get(11));
-			goodData +=(int)(allResults.get(i).results.get(4)+allResults.get(i).results.get(5)+allResults.get(i).results.get(7));
-			allData +=(int)(allResults.get(i).results.get(4)+allResults.get(i).results.get(5)+allResults.get(i).results.get(7)+allResults.get(i).results.get(14));
-			upr += allResults.get(i).results.get(6)/(allResults.get(i).results.get(2)+allResults.get(i).results.get(3)+allResults.get(i).results.get(6));
-			unr += allResults.get(i).results.get(7)/(allResults.get(i).results.get(4)+allResults.get(i).results.get(5)+allResults.get(i).results.get(7));
+			showTandF.set(0 , showTandF.get(0)+strategy1.get(i).tpr);
+			showTandF.set(1 , showTandF.get(1)+strategy1.get(i).fpr);
+			showTandF.set(2 , showTandF.get(2)+strategy2.get(i).tpr);
+			showTandF.set(3 , showTandF.get(3)+strategy2.get(i).fpr);
+			showTandF.set(4 , showTandF.get(4)+strategy3.get(i).tpr);
+			showTandF.set(5 , showTandF.get(5)+strategy3.get(i).fpr);
+			showTandF.set(6 , showTandF.get(6)+strategy4.get(i).tpr);
+			showTandF.set(7 , showTandF.get(7)+strategy4.get(i).fpr);
 		}
-		avgTPR = avgTPR/50;
-		avgFPR = avgFPR/50;
-		upr = upr/50;
-		unr = unr/50;
-//		System.out.println("TPR:	" + bestResult.get(0) + "	,	" + bestResult.get(1)
-//				+ "	FPR:	" + bestResult.get(2)+ "	,	" + bestResult.get(3)
-//				+ "	Tp: " +bestResult.get(4)+ " Fn: " + bestResult.get(5) + " Fp: " + bestResult.get(6)+ " Tn: " + bestResult.get(7)
-//				+ " Tp1: " +bestResult.get(8) + " Fn1: " +bestResult.get(9)+ " Fp1: " +bestResult.get(10) + " Tn1: "+ bestResult.get(11));
-		System.out.println("avgTPR:	" + avgTPR + "	bestTPR	" + bestResult.get(0)+"	avgFPR:	"+ avgFPR
-				+"	bestFPR:	"+ bestResult.get(1)+"	goodRate:	"+goodData/allData+"	,	"
-				+(bestResult.get(4)+bestResult.get(5)+bestResult.get(7))/(bestResult.get(4)+bestResult.get(5)+bestResult.get(7)+bestResult.get(14))+"	OtherRate:	"+ upr+"	UserRate:	"+ unr
-				+"	case1:	"+p1/100+"	case2:	"+p2/100+"	case3:	"+p3/100 +"	case1-1:	"+p4/100+"	score1:	"+p5/100+"	score2:	"+p6/100+"	To'/To:	"+ tcompare/100);//+"	score3:	"+p7/100+"	score4:	"+p7/100);
+//		System.out.print("GoodRate:	"+results.get(2)/100+"	T*/Tu:	" +results.get(5)/100
+//				+"	strategy1:	" +results.get(0)/100 +"	,	"+results.get(1)/100
+//				+"	strategy2:	" +results.get(3)/100 +"	,	"+results.get(4)/100
+//				+"	strategy3:	" +results.get(6)/100 +"	,	"+results.get(7)/100+"	unKnownO	"+results.get(8)/100+"	unKnownU	"+results.get(9)/100
+//				+"	strategy4:	" +results.get(10)/100 +"	,	"+results.get(11)/100+"	unKnownO	"+results.get(12)/100+"	unKnownU	"+results.get(13)/100);
+		System.out.print("GoodRate:	"+results.get(2)/100+"	T*/Tu:	" +results.get(5)/100+"	T*/Tu':	" +results.get(16)/100
+				+"	strategy1:	" +showTandF.get(0)/50 +"	,	"+showTandF.get(1)/50
+				+"	strategy2:	" +showTandF.get(2)/50 +"	,	"+showTandF.get(3)/50+"	T*:TPR	"+ results.get(15)/100
+				+"	strategy3:	" +showTandF.get(4)/50 +"	,	"+showTandF.get(5)/50+"	unKnownO	"+results.get(8)/100+"	unKnownU	"+results.get(9)/100
+				+"	strategy4:	" +showTandF.get(6)/50 +"	,	"+showTandF.get(7)/50+"	unKnownO	"+results.get(12)/100+"	unKnownU	"+results.get(13)/100+"	T*:TPR	"+ results.get(14)/100);
+		System.out.print("	Scoreing1:	");
+		for (int j = 0 ; j<10 ; j++){
+			System.out.print(scase1.get(j).scores / scase1.get(j).counter+"	,	");
+		}
+		System.out.print("	Scoreing2:	");
+		for (int j = 0 ; j<10 ; j++){
+			System.out.print(score1.get(j).scores / score1.get(j).counter+"	,	");
+		}
+		System.out.print("	Scoreing3:	");
+		for (int j = 0 ; j<10 ; j++){
+			System.out.print(score2.get(j).scores / score2.get(j).counter+"	,	");
+		}
+		System.out.println(" ");
+//			resultList temprl = new resultList(tempresult);
+//			allResults.add(temprl);
+//			if (tempresult.get(1)==bestResult.get(1)){
+//				if(tempresult.get(0)>bestResult.get(0)){
+//					bestResult = tempresult;
+//				}
+//				if(tempresult.get(0)==bestResult.get(0)&& (int)(tempresult.get(6)+tempresult.get(7))>(int)(bestResult.get(6)+bestResult.get(7))){
+//					bestResult = tempresult;
+//				}
+//			}
+//			if (tempresult.get(1)<bestResult.get(1)){
+//				bestResult = tempresult;
+//			}
+//			p1+=tempresult.get(8);
+//			p2+=tempresult.get(9);
+//			p3+=tempresult.get(10);
+//			p4+=tempresult.get(11);
+//			p5+=tempresult.get(12);
+//			p6+=tempresult.get(13);
+//			tcompare+=tempresult.get(15);
+////			p7+=tempresult.get(14);
+////			p8+=tempresult.get(15);
+//		}
+//		Collections.sort(allResults);
+//		resultList avgResult = new resultList();
+//		Double avgTPR = 0.0;
+//		Double avgFPR = 0.0;
+//		Double goodData = 0.0;
+//		Double allData = 0.0;
+//		for(int i = 0; i<50; i++){
+//		//	System.out.println("tp: "+allResults.get(i).results.get(1));
+////			System.out.println("fp: "+allResults.get(i).results.get(3));
+//				//avgResult.results.set(j, (avgResult.results.get(j)+allResults.get(i).results.get(j)));
+//			avgTPR += allResults.get(i).results.get(0);
+//			avgFPR += allResults.get(i).results.get(1);
+////			System.out.println("good "+(allResults.get(i).results.get(10)+allResults.get(i).results.get(11))+"total: "+allResults.get(i).results.get(10)+allResults.get(i).results.get(11));
+//			goodData +=(int)(allResults.get(i).results.get(4)+allResults.get(i).results.get(5)+allResults.get(i).results.get(7));
+//			allData +=(int)(allResults.get(i).results.get(4)+allResults.get(i).results.get(5)+allResults.get(i).results.get(7)+allResults.get(i).results.get(14));
+//			upr += allResults.get(i).results.get(6)/(allResults.get(i).results.get(2)+allResults.get(i).results.get(3)+allResults.get(i).results.get(6));
+//			unr += allResults.get(i).results.get(7)/(allResults.get(i).results.get(4)+allResults.get(i).results.get(5)+allResults.get(i).results.get(7));
+//		}
+//		avgTPR = avgTPR/50;
+//		avgFPR = avgFPR/50;
+//		upr = upr/50;
+//		unr = unr/50;
+////		System.out.println("TPR:	" + bestResult.get(0) + "	,	" + bestResult.get(1)
+////				+ "	FPR:	" + bestResult.get(2)+ "	,	" + bestResult.get(3)
+////				+ "	Tp: " +bestResult.get(4)+ " Fn: " + bestResult.get(5) + " Fp: " + bestResult.get(6)+ " Tn: " + bestResult.get(7)
+////				+ " Tp1: " +bestResult.get(8) + " Fn1: " +bestResult.get(9)+ " Fp1: " +bestResult.get(10) + " Tn1: "+ bestResult.get(11));
+//		System.out.println("avgTPR:	" + avgTPR + "	bestTPR	" + bestResult.get(0)+"	avgFPR:	"+ avgFPR
+//				+"	bestFPR:	"+ bestResult.get(1)+"	goodRate:	"+goodData/allData+"	,	"
+//				+(bestResult.get(4)+bestResult.get(5)+bestResult.get(7))/(bestResult.get(4)+bestResult.get(5)+bestResult.get(7)+bestResult.get(14))+"	OtherRate:	"+ upr+"	UserRate:	"+ unr
+//				+"	case1:	"+p1/100+"	case2:	"+p2/100+"	case3:	"+p3/100 +"	case1-1:	"+p4/100+"	score1:	"+p5/100+"	score2:	"+p6/100+"	To'/To:	"+ tcompare/100);//+"	score3:	"+p7/100+"	score4:	"+p7/100);
 	}
 
 //		ArrayList<LocationDecisionModel> valModels = new ArrayList<LocationDecisionModel>();
@@ -623,7 +712,7 @@ System.out.println("--the end--");
 //		valModels.remove(userIndex);
 //		// System.out.println(valModels.size());
 //		// System.out.println("*********************************");
-		public static ArrayList<Double> evaluateLocationModel(ArrayList<LocationDecisionModel> trainModels,
+		public static ArrayList<ArrayList<Double>> evaluateLocationModel(ArrayList<LocationDecisionModel> trainModels,
 				ArrayList<LocationDecisionModel> valModels, ArrayList<LocationDecisionModel> testModels,  ArrayList<LocationDecisionModel> testUserModels) throws IOException {
 /////////////////////////////////////evenly set pattern's frequency//////////////////////
 		LocationDecisionModel trainModel = new LocationDecisionModel();
@@ -650,9 +739,9 @@ System.out.println("--the end--");
 			tempList = giveScore(
 					(evenlySetSeq(tempKC, (trainModels.size() - 1.0))),
 					trainModels.get(i));
-			for (int t = 0; t < tempList.size(); t++) {
+			//for (int t = 0; t < tempList.size(); t++) {
 				// System.out.println(t + "t " + " , " + tempList.get(t));
-			}
+			//}
 			// System.out.println("///////////////////////////////");
 			// kcScoreList.add(giveScore((evenlySetSeq(tempKC,(trainModels.size()
 			// -1.0))), trainModels.get(i)));
@@ -714,7 +803,7 @@ System.out.println("--the end--");
 		ArrayList<ArrayList<PatternScore>> valscorelist = getScoreList(valModels,
 				evenlyTrainModel);
 		
-///////////////////////////////////////// Print Score to file///////////////////////////
+///////////////////////////////////////// Print Score to file/////////////////////////// 
 //		String fileName ="F:\\output-"
 //						+ new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(new Date()) + ".txt";
 //		File f = new File(fileName);
@@ -744,93 +833,94 @@ System.out.println("--the end--");
 //
 //	System.out.close(); // Close file
 //	System.setOut(ps); // Recover System.out
-////	System.out.println("Print in console");
+//	System.out.println("Print in console");
 //////////////////////////////////////////////////////////////////////////////////////////////
-		ArrayList<Rank> tempTest1 = new ArrayList<Rank>();
-		double performance1 = 0.0;
-		for (int t = 0; t < 24; t++) {
-			for(ArrayList<PatternScore> user: testuserscorelist){
-				if (user.get(t).toDouble()< 1.0){
-					tempTest1.add(new Rank(1 ,user.get(t).case1));
-				}
-			}
-			for(ArrayList<PatternScore> other: testscorelist){
-				tempTest1.add(new Rank(0 ,other.get(t).case1));
-			}
-			performance1 += countBestEntropy(tempTest1);
-		}performance1 = performance1/24;
-		
-		ArrayList<Rank> tempTest2 = new ArrayList<Rank>();
-		double performance2 = 0.0;
-		for (int t = 0; t < 24; t++) {
-			for(ArrayList<PatternScore> user: testuserscorelist){
-				if (user.get(t).toDouble()< 1.0){
-					tempTest2.add(new Rank(1 ,user.get(t).case2));
-				}
-			}
-			for(ArrayList<PatternScore> other: testscorelist){
-				tempTest2.add(new Rank(0 ,other.get(t).case2));
-			}
-			performance2 += countBestEntropy(tempTest2);
-		}performance2 = performance2/24;
-		
-
-		ArrayList<Rank> tempTest3 = new ArrayList<Rank>();
-		double performance3 = 0.0;
-		for (int t = 0; t < 24; t++) {
-			for(ArrayList<PatternScore> user: testuserscorelist){
-				if (user.get(t).toDouble()< 1.0){
-					tempTest3.add(new Rank(1 ,user.get(t).case3));
-				}
-			}
-			for(ArrayList<PatternScore> other: testscorelist){
-				tempTest3.add(new Rank(0 ,other.get(t).case3));
-			}
-			performance3 += countBestEntropy(tempTest3);
-		}performance3 = performance3/24;
+//		ArrayList<Rank> tempTest1 = new ArrayList<Rank>();
+//		double performance1 = 0.0;
+//		for (int t = 0; t < 24; t++) {
+//			for(ArrayList<PatternScore> user: testuserscorelist){
+//				if (user.get(t).toDouble()< 1.0){
+//					tempTest1.add(new Rank(1 ,user.get(t).case1));
+//				}
+//			}
+//			for(ArrayList<PatternScore> other: testscorelist){
+//				tempTest1.add(new Rank(0 ,other.get(t).case1));
+//			}
+//			performance1 += countBestEntropy(tempTest1);
+//		}performance1 = performance1/24;
+//		
+//		ArrayList<Rank> tempTest2 = new ArrayList<Rank>();
+//		double performance2 = 0.0;
+//		for (int t = 0; t < 24; t++) {
+//			for(ArrayList<PatternScore> user: testuserscorelist){
+//				if (user.get(t).toDouble()< 1.0){
+//					tempTest2.add(new Rank(1 ,user.get(t).case2));
+//				}
+//			}
+//			for(ArrayList<PatternScore> other: testscorelist){
+//				tempTest2.add(new Rank(0 ,other.get(t).case2));
+//			}
+//			performance2 += countBestEntropy(tempTest2);
+//		}performance2 = performance2/24;
+//		
+//
+//		ArrayList<Rank> tempTest3 = new ArrayList<Rank>();
+//		double performance3 = 0.0;
+//		for (int t = 0; t < 24; t++) {
+//			for(ArrayList<PatternScore> user: testuserscorelist){
+//				if (user.get(t).toDouble()< 1.0){
+//					tempTest3.add(new Rank(1 ,user.get(t).case3));
+//				}
+//			}
+//			for(ArrayList<PatternScore> other: testscorelist){
+//				tempTest3.add(new Rank(0 ,other.get(t).case3));
+//			}
+//			performance3 += countBestEntropy(tempTest3);
+//		}performance3 = performance3/24;
 		
 //System.out.println("pass 3");		
-		ArrayList<Rank> tempTest4 = new ArrayList<Rank>();
-		double performance4 = 0.0;
-		for (int t = 0; t < 24; t++) {
-			for(ArrayList<PatternScore> user: testuserscorelist){
-				if (user.get(t).toDouble()< 1.0){
-					tempTest4.add(new Rank(1 ,user.get(t).sumcase1ferq));
-				}
-			}
-			for(ArrayList<PatternScore> other: testscorelist){
-				tempTest4.add(new Rank(0 ,other.get(t).sumcase1ferq));
-			}
-			performance4 += countBestEntropy(tempTest4);
-		}performance4 = performance4/24;
-//System.out.println("pass 4");
-		ArrayList<Rank> tempTest5 = new ArrayList<Rank>();
-		double performance5 = 0.0;
-		for (int t = 0; t < 24; t++) {
-			for(ArrayList<PatternScore> user: testuserscorelist){
-				if (user.get(t).toDouble()< 1.0){
-					tempTest5.add(new Rank(1 ,user.get(t).toDouble()));
-				}
-			}
-			for(ArrayList<PatternScore> other: testscorelist){
-				tempTest5.add(new Rank(0 ,other.get(t).toDouble()));
-			}
-			performance5 += countBestEntropy(tempTest5);
-		}performance5 = performance5/24;
-//System.out.println("pass 5");
-		ArrayList<Rank> tempTest6 = new ArrayList<Rank>();
-		double performance6 = 0.0;
-		for (int t = 0; t < 24; t++) {
-			for(ArrayList<PatternScore> user: testuserscorelist){
-				if (user.get(t).toDouble()< 1.0){
-					tempTest6.add(new Rank(1 ,user.get(t).toDouble2()));
-				}
-			}
-			for(ArrayList<PatternScore> other: testscorelist){
-				tempTest6.add(new Rank(0 ,other.get(t).toDouble2()));
-			}
-			performance6 += countBestEntropy(tempTest6);
-		}performance6 = performance6/24;
+//		ArrayList<Rank> tempTest4 = new ArrayList<Rank>();
+//		double performance4 = 0.0;
+//		for (int t = 0; t < 24; t++) {
+//			for(ArrayList<PatternScore> user: testuserscorelist){
+//				if (user.get(t).toDouble()< 1.0){
+//					tempTest4.add(new Rank(1 ,user.get(t).sumcase1ferq));
+//				}
+//			}
+//			for(ArrayList<PatternScore> other: testscorelist){
+//				tempTest4.add(new Rank(0 ,other.get(t).sumcase1ferq));
+//			}
+//			performance4 += countBestEntropy(tempTest4);
+//		}performance4 = performance4/24;
+//////System.out.println("pass 4");
+//		ArrayList<Rank> tempTest5 = new ArrayList<Rank>();
+//		double performance5 = 0.0;
+//		for (int t = 0; t < 24; t++) {
+//			for(ArrayList<PatternScore> user: testuserscorelist){
+//				if (user.get(t).toDouble()< 1.0){
+//					tempTest5.add(new Rank(1 ,user.get(t).toDouble()));
+//				}
+//			}
+//			for(ArrayList<PatternScore> other: testscorelist){
+//				tempTest5.add(new Rank(0 ,other.get(t).toDouble()));
+//			}
+//			performance5 += countBestEntropy(tempTest5);
+//		}performance5 = performance5/24;
+//////System.out.println("pass 5");
+//		ArrayList<Rank> tempTest6 = new ArrayList<Rank>();
+//		double performance6 = 0.0;
+//		for (int t = 0; t < 24; t++) {
+//			for(ArrayList<PatternScore> user: testuserscorelist){
+//				if (user.get(t).toDouble()< 1.0){
+//					tempTest6.add(new Rank(1 ,user.get(t).toDouble2()));
+//				}
+//			}
+//			for(ArrayList<PatternScore> other: testscorelist){
+//				tempTest6.add(new Rank(0 ,other.get(t).toDouble2()));
+//			}
+//			performance6 += countBestEntropy(tempTest6);
+//		}performance6 = performance6/24;
+		
 //System.out.println("pass 6");
 //		ArrayList<Rank> tempTest7 = new ArrayList<Rank>();
 //		double performance7 = 0.0;
@@ -861,7 +951,7 @@ System.out.println("--the end--");
 //		}performance8 = performance8/24;
 //		System.out.print("case1:	"+ performance1+"	case2:	"+performance2+"	case3:	"+performance3);
 //		System.out.println("	case1:	"+ performance4+"	case2:	"+performance5+"	case3:	"+performance6);
-//////////////////////////////////////////////////////////////////////////////////////////////
+
 /////////////////////////////// set decision threshold ///////////////////////////////////////
 //		decisionThreshold = new ArrayList<Double>();
 		ArrayList<DecisionRange> decisionRanges = new ArrayList<DecisionRange>();
@@ -936,8 +1026,124 @@ System.out.println("--the end--");
 //		 System.out.println("-------------------------------");
 //		 System.out.println("-------------------------------");
 //		 }
-		// ////////////////////////////////////////////////////////////////////////////////////////
-		ArrayList<Double> result = new ArrayList<Double>();
+//////////////////////////////////////////////////////////////////////////////////////////////
+		ArrayList<Rank> tempTest4 = new ArrayList<Rank>();
+		ArrayList<Roc> roc1 = new ArrayList<Roc>();
+		for (int i = 0; i<10;i++){
+			roc1.add(new Roc(0.0, 0.0));
+		}
+		ArrayList<Roc> tempRoc1 = new ArrayList<Roc>();
+		for (int t = 0; t < 24; t++) {
+			tempTest4 = new ArrayList<Rank>();
+			tempRoc1 = new ArrayList<Roc>();
+			for(ArrayList<PatternScore> user: testuserscorelist){
+				if (user.get(t).toDouble()< 1.0){
+					tempTest4.add(new Rank(1 ,100000 - user.get(t).sumcase1ferq));
+				}
+			}
+			for(ArrayList<PatternScore> other: testscorelist){
+				tempTest4.add(new Rank(0 ,100000 - other.get(t).sumcase1ferq));
+			}
+			tempRoc1.addAll(GiveTPRandFPRforROC(tempTest4, (tempTest4.size()- testscorelist.size()), testscorelist.size()));
+//for (int i = 0; i<10;i++){
+//System.out.println("outside: "+tempRoc1.get(i).scores+" , "+ tempRoc1.get(i).counter);
+//}
+			for (int i = 0; i<10;i++){
+				roc1.set(i,  new Roc((tempRoc1.get(i).counter + roc1.get(i).counter) ,(tempRoc1.get(i).scores + roc1.get(i).scores)));
+			}
+		}
+		ArrayList<Double> rocList1 = new ArrayList<Double>();
+		for (int i = 0; i<10;i++){
+//System.out.println( roc1.get(i).scores+" , "+ roc1.get(i).counter);
+			if (roc1.get(i).counter == 0){
+				rocList1.add(0.0);
+			}else{
+				rocList1.add(roc1.get(i).scores/roc1.get(i).counter);
+			}
+		}
+
+////System.out.println("pass 4");
+		ArrayList<Rank> tempTest5 = new ArrayList<Rank>();
+		ArrayList<Roc> roc2 = new ArrayList<Roc>();
+		for (int i = 0; i<10;i++){
+			roc2.add(new Roc(0.0, 0.0));
+		}
+		ArrayList<Roc> tempRoc2 = new ArrayList<Roc>();
+		for (int t = 7; t < 20; t++) {
+			tempTest5 = new ArrayList<Rank>();
+			tempRoc2 = new ArrayList<Roc>();
+			for(ArrayList<PatternScore> user: testuserscorelist){
+					if (user.get(t).toDouble()< 1.0){
+						tempTest5.add(new Rank(1 ,user.get(t).toDouble()));
+					}
+			}
+			for(ArrayList<PatternScore> user: kcScoreList){
+				if (user.get(t).toDouble()< 1.0){
+					tempTest5.add(new Rank(1 ,user.get(t).toDouble()));
+				}
+			}
+			if (tempTest5.size()>20){
+				for(ArrayList<PatternScore> other: testscorelist){
+					tempTest5.add(new Rank(0 ,other.get(t).toDouble()));
+				}
+				tempRoc2.addAll(GiveTPRandFPRforROC(tempTest5, (tempTest5.size()- testscorelist.size()), testscorelist.size()));
+				for (int i = 0; i<10;i++){
+					roc2.set(i,  new Roc((tempRoc2.get(i).counter + roc2.get(i).counter) ,(tempRoc2.get(i).scores + roc2.get(i).scores)));
+				}
+			}
+		}
+		ArrayList<Double> rocList2 = new ArrayList<Double>();
+		for (int i = 0; i<10;i++){
+			if (roc2.get(i).counter == 0){
+				rocList2.add(0.0);
+			}else{
+				rocList2.add(roc2.get(i).scores/roc2.get(i).counter);
+//if(roc2.get(i).scores/roc2.get(i).counter > 1.0){
+//System.out.println("11111111111111111111111111111\r\n"+ roc2.get(i).scores+" , "+roc2.get(i).counter +"\r\n111111111111111111111111");
+//}
+			}
+		}
+////System.out.println("pass 5");
+		ArrayList<Rank> tempTest6 = new ArrayList<Rank>();
+		ArrayList<Roc> roc3 = new ArrayList<Roc>();
+		for (int i = 0; i<10;i++){
+			roc3.add(new Roc(0.0, 0.0));
+		}
+		ArrayList<Roc> tempRoc3 = new ArrayList<Roc>();
+		for (int t = 7; t < 20; t++) {
+			tempTest6 = new ArrayList<Rank>();
+			tempRoc3 = new ArrayList<Roc>();
+			for(ArrayList<PatternScore> user: testuserscorelist){
+				if (user.get(t).toDouble()< 1.0){
+					tempTest6.add(new Rank(1 ,user.get(t).toDouble2()));
+				}
+			}
+			for(ArrayList<PatternScore> user: kcScoreList){
+				if (user.get(t).toDouble()< 1.0){
+					tempTest6.add(new Rank(1 ,user.get(t).toDouble()));
+				}
+			}
+			if (tempTest6.size()>20){
+				for(ArrayList<PatternScore> other: testscorelist){
+					tempTest6.add(new Rank(0 ,other.get(t).toDouble2()));
+				}
+				tempRoc3.addAll(GiveTPRandFPRforROC(tempTest6, (tempTest6.size()- testscorelist.size()), testscorelist.size()));
+				for (int i = 0; i<10;i++){
+					roc3.set(i,  new Roc((tempRoc3.get(i).counter + roc3.get(i).counter),(tempRoc3.get(i).scores + roc3.get(i).scores)));
+				}
+			}
+		}
+		ArrayList<Double> rocList3 = new ArrayList<Double>();
+		for (int i = 0; i<10;i++){
+			if (roc3.get(i).counter == 0){
+				rocList3.add(0.0);
+			}else{
+				rocList3.add(roc3.get(i).scores/roc3.get(i).counter);
+			}
+		}
+////////////////////////////////////////////////////////////////////////////////////////// use KC max
+		ArrayList<ArrayList<Double>> result = new ArrayList<ArrayList<Double>>();
+		ArrayList<Double> result1 = new ArrayList<Double>();
 		Double tp = 0.0;
 		Double fp = 0.0;
 		Double tn = 0.0;
@@ -945,141 +1151,251 @@ System.out.println("--the end--");
 		Double up = 0.0;
 		Double un = 0.0;
 		Double badData = 0.0;
-//		for (int t = 0; t < 24; t++) {
-//			for (int i = 0; i < testscorelist.size(); i++) {
-//				// System.out.print(testscorelist.get(i));{
-//				if (testscorelist.get(i).get(t).toDouble2() > decisionThreshold.get(t)) {// kcScoreMax.get(t)){ //decisionThreshold.get(t)) {
-//					tp++;
-//				} else {
-//					fn++;
-//				}
-//				// System.out.println(" "+(testscorelist.get(i) >=
-//				// decisionThreshold?"T":"F"));
-//			}
-//			for (int i = 0; i < testuserscorelist.size(); i++) {
-//				if (testuserscorelist.get(i).get(t).toDouble2() <= decisionThreshold.get(t)) {//kcScoreMax.get(t)){ //decisionThreshold.get(t)) {
-//					tn++;
-//				} else {
-//					fp++;
-//				}
-//			}
-//		}
-
-//		Double tp1 = 0.0;
-//		Double fp1 = 0.0;
-//		Double tn1 = 0.0;
-//		Double fn1 = 0.0;
-/////////////////////////////////////////////////////////////////////
-		ArrayList<Double> testmax = new ArrayList<Double>();
-		for (int t = 0; t<24; t++){
-			testmax.add(decisionRanges.get(t).max);
-		}
-		for (int i = 0; i < testuserscorelist.size(); i++) {
-			for (int t = 0; t < 24; t++) {
-				if (testuserscorelist.get(i).get(t).toDouble2()> testmax.get(t) && testuserscorelist.get(i).get(t).toDouble2()< 1.0){
-					testmax.set(t, testuserscorelist.get(i).get(t).toDouble2());
-				}
-			}
-		}
-
-//////////////////////////////////////////////////////////////////////
-		
-//		for (int t = 0; t < 24; t++) {
-//	//		System.out.println(t+" , "+decisionRanges.get(t).max+" , "+decisionRanges.get(t).min);
-//			for (int i = 0; i < testscorelist.size(); i++) {
-//				// System.out.print(testscorelist.get(i));{
-//				if (testscorelist.get(i).get(t).toDouble2() >= decisionRanges.get(t).max){//decisionThreshold.get(t)) {// kcScoreMax.get(t)){ //decisionThreshold.get(t)) {
-//					tp++;
-//				}else if(testscorelist.get(i).get(t).toDouble2() < decisionRanges.get(t).min){
-//					fn++;
-//				}else{
-//					up++;
-//				}
-//				// System.out.println(" "+(testscorelist.get(i) >=
-//				// decisionThreshold?"T":"F"));
-//			}
-//		}
-//		for (int i = 0; i < testuserscorelist.size(); i++) {
-//			for (int t = 0; t < 24; t++) {
-//				if (testuserscorelist.get(i).get(t).toDouble2() < 1.0){
-//					if (testuserscorelist.get(i).get(t).toDouble2() <= decisionRanges.get(t).min){//decisionThreshold.get(t)) {//kcScoreMax.get(t)){ //decisionThreshold.get(t)) {
-//						tn++;
-////						System.out.println(i+" "+t +" T");
-//					} else if (testuserscorelist.get(i).get(t).toDouble2() > decisionRanges.get(t).max){
-//						fp++;
-////						System.out.println(i+" "+t +" F");
-//					}else {
-//						un++;
-//					}
-//				}else{
-//					//un++;
-//					badData ++;
-////				System.out.println(i+" "+t + " "+testuserscorelist.get(i).get(t));
-//				}
-//			}
-//		}
-/////////////////////////////////////////////////////////////////////////////////////////
 		for (int t = 0; t < 24; t++) {
-	//		System.out.println(t+" , "+decisionRanges.get(t).max+" , "+decisionRanges.get(t).min);
+
 			for (int i = 0; i < testscorelist.size(); i++) {
-				// System.out.print(testscorelist.get(i));{
-				if (testscorelist.get(i).get(t).toDouble2() >= testmax.get(t)){//decisionThreshold.get(t)) {// kcScoreMax.get(t)){ //decisionThreshold.get(t)) {
+				if (testscorelist.get(i).get(t).toDouble2() >=  kcScoreMax.get(t)){ //decisionThreshold.get(t)) {
 					tp++;
 				}else{
 					fn++;
 				}
-				// System.out.println(" "+(testscorelist.get(i) >=
-				// decisionThreshold?"T":"F"));
+
 			}
 		}
 		for (int i = 0; i < testuserscorelist.size(); i++) {
 			for (int t = 0; t < 24; t++) {
 				if (testuserscorelist.get(i).get(t).toDouble2() < 1.0){
-					if (testuserscorelist.get(i).get(t).toDouble2() <= testmax.get(t)){//decisionThreshold.get(t)) {//kcScoreMax.get(t)){ //decisionThreshold.get(t)) {
+					if (testuserscorelist.get(i).get(t).toDouble2() <= kcScoreMax.get(t)){ //decisionThreshold.get(t)) {
 						tn++;
-//						System.out.println(i+" "+t +" T");
 					} else{
 						fp++;
-//						System.out.println(i+" "+t +" F");
 					}
 				}else{
-					//un++;
 					badData ++;
-//				System.out.println(i+" "+t + " "+testuserscorelist.get(i).get(t));
 				}
 			}
 		}
-		// System.out.println("Accurcy:"+ (tn+tp) / testscorelist.size());
-		result.add(tp / (tp + fn + up));
-		result.add(fp / (fp + tn + un + badData));
-		result.add(tp);
-		result.add(fn);
-		result.add(fp);
-		result.add(tn);
-		result.add(up);
-		result.add(un);
-		result.add(performance1);
-		result.add(performance2);
-		result.add(performance3);
-		result.add(performance4);
-		result.add(performance5);
-		result.add(performance6);
-//		result.add(performance7);
-//		result.add(performance8);
-		result.add(badData);
-		double thresholdCompare = 0.0;
+		result1.add(tp / (tp + fn));
+		result1.add(fp / (fp + tn));
+//		result1.add(tp);
+//		result1.add(fn);
+//		result1.add(fp);
+//		result1.add(tn);
+		result1.add((tn+fp)/(tn+fp+badData));
+		result.add(result1);
+////////////////////////////////////////////////////////////////////////rising threshold by fp
+		ArrayList<Double> testmax = new ArrayList<Double>();
 		for (int t = 0; t<24; t++){
-			thresholdCompare += (testmax.get(t)/ decisionRanges.get(t).max);
+			testmax.add(kcScoreMax.get(t));
 		}
 		
-		result.add (thresholdCompare /24);
+		ArrayList<Double> result2 = new ArrayList<Double>();
+		Double tp2 = 0.0;
+		Double fp2 = 0.0;
+		Double tn2 = 0.0;
+		Double fn2 = 0.0;
+		Double badData2 = 0.0;
 		
-//		System.out.println("TPR:	" + tp / (tp + fn) + "	,	" + tp1 / (tp1 + fn1)
-//				+ "	FPR:	" + fp / (fp + tn) + "	,	" + fp1 / (fp1 + tn1)
-//				+ "	Tp: " + tp + " Fn: " + fn + " Fp: " + fp + " Tn: " + tn
-//				+ " Tp1: " + tp1 + " Fn1: " + fn1 + " Fp1: " + fp1 + " Tn1: "
-//				+ tn1);
-//		System.out.println("TPR:	" + tp / (tp + fn) + "	,	" + tp1 / (tp1 + fn1)+ "	FPR:	" + fp / (fp + tn) + "	,	" + fp1 / (fp1 + tn1));
+		Double tp22 = 0.0;
+		Double fn22 = 0.0;
+		for (int t = 0; t < 24; t++) {
+			for (int i = 0; i < testscorelist.size(); i++) {
+				if (testscorelist.get(i).get(t).toDouble2() >= testmax.get(t)){
+					tp2++;
+				}else{
+					fn2++;
+				}
+			}
+		}
+		for (int i = 0; i < testuserscorelist.size(); i++) {
+			for (int t = 0; t < 24; t++) {
+				if (testuserscorelist.get(i).get(t).toDouble2() < 1.0){
+					if (testuserscorelist.get(i).get(t).toDouble2() <= testmax.get(t)){
+						tn2++;
+					} else{
+						testmax.set(t, testuserscorelist.get(i).get(t).toDouble2());
+						fp2++;
+					}
+				}else{
+					badData2 ++;
+				}
+			}
+		}
+		for (int t = 0; t < 24; t++) {
+			for (int i = 0; i < testscorelist.size(); i++) {
+				if (testscorelist.get(i).get(t).toDouble2() >= testmax.get(t)){
+					tp22++;
+				}else{
+					fn22++;
+				}
+			}
+		}
+		tp2 = (tp2+tp22) / 2;
+//		fn2 = (fn2+fn22) / 2;
+		result2.add(tp2 / (tp2 + fn2));
+		result2.add(fp2 / (fp2 + tn2));
+//		result2.add(tp2);
+//		result2.add(fn2);
+//		result2.add(fp2);
+//		result2.add(tn2);
+		double thresholdCompare = 0.0;
+		double counterT = 0.0;
+		for (int t = 0; t<24; t++){
+			if (kcScoreMax.get(t)>0.001){
+				thresholdCompare += (testmax.get(t)/ kcScoreMax.get(t));
+				counterT ++;
+			}
+//			System.out.println(testmax.get(t)/ kcScoreMax.get(t)+" , "+testmax.get(t)/decisionRanges.get(t).max);
+		}
+//		System.out.println(testmax.get(t)/ kcScoreMax.get(t));
+		
+		result2.add (thresholdCompare /counterT);
+		result.add(result2);
+/////////////////////////////////////////////////////////////////////
+
+//		for (int i = 0; i < testuserscorelist.size(); i++) {
+//			for (int t = 0; t < 24; t++) {
+//				if (testuserscorelist.get(i).get(t).toDouble2()> testmax.get(t) && testuserscorelist.get(i).get(t).toDouble2()< 1.0){
+//					testmax.set(t, testuserscorelist.get(i).get(t).toDouble2());
+//				}
+//			}
+//		}
+
+////////////////////////////////////////////////////////////////////// with two threshold
+		ArrayList<Double> result3 = new ArrayList<Double>();
+		Double tp3 = 0.0;
+		Double fp3 = 0.0;
+		Double tn3 = 0.0;
+		Double fn3 = 0.0;
+		Double up3 = 0.0;
+		Double un3 = 0.0;
+		Double badData3 = 0.0;
+		
+		for (int t = 0; t < 24; t++) {
+			for (int i = 0; i < testscorelist.size(); i++) {
+				if (testscorelist.get(i).get(t).toDouble2() >= decisionRanges.get(t).max){//decisionThreshold.get(t)) {// kcScoreMax.get(t)){ //decisionThreshold.get(t)) {
+					tp3++;
+				}else if(testscorelist.get(i).get(t).toDouble2() < decisionRanges.get(t).min){
+					fn3++;
+				}else{
+					up3++;
+				}
+			}
+		}
+		for (int i = 0; i < testuserscorelist.size(); i++) {
+			for (int t = 0; t < 24; t++) {
+				if (testuserscorelist.get(i).get(t).toDouble2() < 1.0){
+					if (testuserscorelist.get(i).get(t).toDouble2() <= decisionRanges.get(t).min){//decisionThreshold.get(t)) {//kcScoreMax.get(t)){ //decisionThreshold.get(t)) {
+						tn3++;
+					} else if (testuserscorelist.get(i).get(t).toDouble2() > decisionRanges.get(t).max){
+						fp3++;
+					}else {
+						un3++;
+					}
+				}else{
+					badData3 ++;
+				}
+			}
+		}
+		result3.add(tp3 / (tp3 + fn3 + up3));
+		result3.add(fp3 / (fp3 + tn3 + un3 + badData3));
+//		result3.add(tp3);
+//		result3.add(fn3);
+//		result3.add(fp3);
+//		result3.add(tn3);
+		result3.add(up3 / (tp3 + fn3 + up3));
+		
+		result3.add((un3 + badData3) / (fp3 + tn3 + un3 + badData3));
+		result.add(result3);
+/////////////////////////////////////////////////////////////////////////////////////////
+		ArrayList<Double> testmax2 = new ArrayList<Double>();
+		for (int t = 0; t<24; t++){
+			testmax2.add(decisionRanges.get(t).max);
+		}
+		ArrayList<Double> result4 = new ArrayList<Double>();
+		Double tp4 = 0.0;
+		Double fp4 = 0.0;
+		Double tn4 = 0.0;
+		Double fn4 = 0.0;
+		Double up4 = 0.0;
+		Double un4 = 0.0;
+		Double badData4 = 0.0;
+		
+		Double tp42 = 0.0;
+		Double fn42 = 0.0;
+		Double up42 = 0.0;
+		for (int t = 0; t < 24; t++) {
+			for (int i = 0; i < testscorelist.size(); i++) {
+				if (testscorelist.get(i).get(t).toDouble2() >= testmax2.get(t)){
+					tp4++;
+				}else if(testscorelist.get(i).get(t).toDouble2() < decisionRanges.get(t).min){
+					fn4++;
+				}else{
+					up4++;
+				}
+			}
+		}
+		for (int i = 0; i < testuserscorelist.size(); i++) {
+			for (int t = 0; t < 24; t++) {
+				if (testuserscorelist.get(i).get(t).toDouble2() < 1.0){
+					if (testuserscorelist.get(i).get(t).toDouble2() <=   decisionRanges.get(t).min){
+						tn4++;
+					} else if (testuserscorelist.get(i).get(t).toDouble2() > testmax2.get(t)){
+						testmax2.set(t, testuserscorelist.get(i).get(t).toDouble2());
+						fp4++;
+					}else {
+						un4++;
+					}
+				}else{
+					badData4 ++;
+				}
+			}
+		}
+		for (int t = 0; t < 24; t++) {
+			for (int i = 0; i < testscorelist.size(); i++) {
+				if (testscorelist.get(i).get(t).toDouble2() >= testmax2.get(t)){
+					tp42++;
+				}else if(testscorelist.get(i).get(t).toDouble2() < decisionRanges.get(t).min){
+					fn42++;
+				}else{
+					up42++;
+				}
+			}
+		}
+		tp4 = (tp4+tp42)/2;
+//		fn4 = (fn4+fn42)/2;
+//		up4 = (up4+up42)/2;
+		result4.add(tp4 / (tp4 + fn4 + up4));
+		result4.add(fp4 / (fp4 + tn4 + un4 + badData4));
+//		result4.add(tp4);
+//		result4.add(fn4);
+//		result4.add(fp4);
+//		result4.add(tn4);
+		result4.add(up4 / (tp4 + fn4 + up4));
+		result4.add((un4 + badData4) / (fp4 + tn4 + un4 + badData4));	
+		
+		result4.add(tp42 / (tp4 + fn4 + up4));
+		result4.add(tp22 / (tp2 + fn2));
+			
+		
+		double thresholdCompare4 = 0.0;
+		double counterT4 = 0.0;
+		for (int t = 0; t<24; t++){
+			if (decisionRanges.get(t).max >0.001){
+				thresholdCompare4 += (testmax2.get(t)/decisionRanges.get(t).max);
+				counterT4 ++;
+			}
+//			System.out.println(testmax.get(t)/ kcScoreMax.get(t)+" , "+testmax.get(t)/decisionRanges.get(t).max);
+			
+		}
+//		System.out.println(testmax.get(t)/ kcScoreMax.get(t));
+		
+		result4.add (thresholdCompare4 /counterT4);
+		result.add(result4);
+/////////////////////////////////////////////////////////////////////////////////////////
+		result.add(rocList1);
+		result.add(rocList2);
+		result.add(rocList3);
 		return result;
 	}
 
@@ -1100,7 +1416,7 @@ System.out.println("--the end--");
 	public static ArrayList<PatternScore> giveScore(LocationDecisionModel a,
 			LocationDecisionModel b) {
 		ArrayList<PatternScore> resultGS = new ArrayList<PatternScore>();
-		ArrayList<PatternScore> resultGS1 = new ArrayList<PatternScore>();
+//		ArrayList<PatternScore> resultGS1 = new ArrayList<PatternScore>();
 		// double retrunS=0.0;
 		PatternScore tempPS;
 		for (int r = 0; r < 24; r++) {
@@ -1130,6 +1446,69 @@ System.out.println("--the end--");
 		return resultGS;
 	}
 	
+
+	public static ArrayList<Roc> GiveTPRandFPRforROC(ArrayList<Rank> a, int u, int o){
+		Collections.sort(a);
+		ArrayList<Roc> tprAndfpr = new ArrayList<Roc>();
+		int[] counter = new int[10];
+		double[] scores = new double[10];
+		for (int i = 0; i<10; i++){
+			counter[i]=0;
+			scores[i]=0.0;
+			
+		}
+		
+		double tpr;
+		double fpr;
+		for (int i =1; i < a.size();i++){
+			tpr = new Double(0.0);
+			fpr = new Double(0.0);
+			if (a.get(i-1).identity != a.get(i).identity){
+				for (int k = 0; k< i; k++){
+					if (a.get(k).identity == 0){
+						tpr ++;
+					}else{
+						fpr++;
+					}
+				}
+				tpr = tpr/o;
+				fpr = fpr/u;
+//				for (int j = i; j<a.size();j++){
+//					if (a.get(j).identity == 1){
+//						fpr ++;
+//					}
+//				}
+//				System.out.println("tpr:	"+tpr/o+"	fpr:	"+fpr/u+ "	other	"+o+"	tp	"+tpr+ "	user	"+u+"	fp	"+fpr);
+//				tprAndfpr.add(tpr/o);
+//				tprAndfpr.add(fpr/u);
+//				System.out.println("befor "+tpr+" , "+fpr);
+				if (fpr<=0.1) {scores[0] += tpr; counter[0]++;}
+				else if (fpr<=0.2) {scores[1] += tpr; counter[1]++;}
+				else if (fpr<=0.3) {scores[2] += tpr; counter[2]++;}
+				else if (fpr<=0.4) {scores[3] += tpr; counter[3]++;}
+				else if (fpr<=0.5) {scores[4] += tpr; counter[4]++;}
+				else if (fpr<=0.6) {scores[5] += tpr; counter[5]++;}
+				else if (fpr<=0.7) {scores[6] += tpr; counter[6]++;}
+				else if (fpr<=0.8) {scores[7] += tpr; counter[7]++;}
+				else if (fpr<=0.9) {scores[8] += tpr; counter[8]++;}
+				else if (fpr<=1.0) {scores[9] += tpr; counter[9]++;}
+//				if(((int)(fpr*10)) < 10){
+//					scores[(int)(fpr*10)] += tpr;
+//					counter[(int)(fpr*10)]++;
+//				}else{
+//					scores[9] += tpr;
+//					counter[9]++;
+//				}
+			}
+		}
+//		System.out.println(" after ");
+		for (int i = 0; i<10; i++){
+//			System.out.println("inside: "+counter[i]+" , "+scores[i]);
+			tprAndfpr.add(new Roc(counter[i] , (Double)scores[i]));			
+		}
+		
+		return tprAndfpr;
+	}
 
 	public static double countBestEntropy(ArrayList<Rank> a){
 //		System.out.println("////////////////////////////");
@@ -1165,75 +1544,6 @@ System.out.println("--the end--");
 			return (-p*Math.log(p)/Math.log(2) - n*Math.log(n)/Math.log(2))*list.size();
 		}
 	}
-
-
-//	public static double givePatternScore(PatternTable training, PatternTable b, HashSet ths, HashSet hs) {
-//		Double score = new Double(0.0);
-//		Double sumOfPattern = new Double(0.0);
-//		Double case1 = new Double(0.0);
-//		Double case2 = new Double(0.0);
-//		Double case3 = new Double(0.0);
-//
-//		for (Pattern x : training.patternMap.values()) {
-//			sumOfPattern += x.frequency;
-//		}
-//		for (Pattern x : b.patternMap.values()) {
-//			sumOfPattern += x.frequency;
-//		}
-//		for (String patternTraining : training.patternMap.keySet()) {
-//			if (b.patternMap.containsKey(patternTraining)) {
-//				case1+= (Math
-//						.abs(training.patternMap.get(patternTraining).frequency
-//								- b.patternMap.get(patternTraining).frequency));
-//			} else {
-//				case2 += training.patternMap.get(patternTraining).frequency;
-//			}
-//		}
-//		for (String patternB : b.patternMap.keySet()) {
-//			if (!training.patternMap.containsKey(patternB)) {
-//				case3 += b.patternMap.get(patternB).frequency;
-//			}
-//		}
-//		score = case1 + case2 + case3;
-//		if (hs.size() == 0){
-//			return 2.0;//(score/sumOfPattern)/ (hs.size() /ths.size());
-//		}else{
-//			return (score/sumOfPattern);
-//		}
-//	}
-//		if (printOrNot == 1){
-//			System.out.println(case1+ "	"+ case2+ "	"+case3);
-//			//System.out.println(ths.size()+", "+hs.size());
-//		}
-		// System.out.println("training: "+training.patternMap.size()+"  test: "+
-		// b.patternMap.size()+" score: "+score);
-		// System.out.println(sumOfPattern+" , "+training.patternMap.size()+" , "+b.patternMap.size()+" , "+score/sumOfPattern);
-//		if (case1 == 0 && case3 == 0){
-//			return 2.0;
-//				//return (score / sumOfPattern)/ (hs.size() /ths.size());
-//				//return (score / sumOfPattern) /  ths.size();
-//		}else{
-//			return (case1+case2 / sumOfPattern);//(case1+case2)/sumOfPattern;
-//		}
-//		if (case1 == 0 && case3 == 0){
-//		if (case1 == 0 && case3 == 0){
-//			return 2.0;
-//				//return (score / sumOfPattern)/ (hs.size() /ths.size());
-//				//return (score / sumOfPattern) /  ths.size();
-//		}else{
-//			return (score / sumOfPattern);//(case1+case2)/sumOfPattern;
-//		}
-//		return score / sumOfPattern;
-//		System.out.println(score/ hs.size());
-//		System.out.println(score);
-//		System.out.println(hs.size());
-//		if (hs.size()!= 0 && ths.size()!=0){
-//			return score / (hs.size() /ths.size());
-//		}else{
-//			return score;
-//		}
-//		return score ;
-
 
 
 	@SuppressWarnings("unchecked")
@@ -1281,16 +1591,16 @@ System.out.println("--the end--");
 		return evenlyModel;
 	}
 }
-class Rank implements Comparable<Rank>{
-	 double s;
-	 int identity;
-	public Rank(int identity, double score){
-		this.s = score;
-		this.identity = identity;
+class ResultsTandF implements Comparable<ResultsTandF>{
+	 double tpr;
+	 double fpr;
+	public ResultsTandF(double t, double f){
+		this.tpr = t;
+		this.fpr = f;
 	}
 	@Override
-	public int compareTo(Rank o) {
-		return (int) (this.s*10000 - o.s*10000);
+	public int compareTo(ResultsTandF o) {
+		return (int) (this.fpr*10000 - o.fpr*10000);
 	}
 }
 class DecisionRange {
@@ -1304,4 +1614,17 @@ class DecisionRange {
 //	public int compareTo(Rank o) {
 //		return (int) (this.s*10000 - o.s*10000);
 //	}
+}
+class Roc
+{
+	double counter;
+	double scores;
+	public Roc(){
+		this.counter = 0.0;
+		this.scores = 0.0;
+	}
+	public Roc(double c, double s){
+		this.counter = c;
+		this.scores = s;
+	}
 }

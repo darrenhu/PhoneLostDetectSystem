@@ -20,7 +20,7 @@ import be.ac.ulg.montefiore.run.jahmm.OpdfIntegerFactory;
 import be.ac.ulg.montefiore.run.jahmm.learn.BaumWelchLearner;
 
 public class TempJava {
-	public static Hmm<ObservationInteger> buildHmm(List<List<String>> entityLists, int numOfIterations){
+	public static Hmm<ObservationInteger> buildHmm(List<List<String>> entityLists,List<List<String>> testList, int numOfIterations){
         String fileName =
                 "output_"
                         + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss")
@@ -60,6 +60,23 @@ public class TempJava {
             }
 	        sequences.add(seq);
 	    }
+/////////////////////////////////////////////////////////////////////////////////////////
+	    List<List<ObservationInteger>> testSeq = new ArrayList<List<ObservationInteger>>();
+	    for(List<String> entityList: testList){
+	        List<ObservationInteger> seq = new ArrayList<ObservationInteger>();
+	        for(String entity: entityList){
+	            int entityId;
+	            if(entity2Id.containsKey(entity)){
+	                entityId = entity2Id.get(entity);
+	            } else {
+	                entityId = entity2Id.size();
+	                entity2Id.put(entity, entityId);
+	            }
+	            seq.add(new ObservationInteger(entityId));
+            }
+	        testSeq.add(seq);
+	    }
+/////////////////////////////////////////////////////////////////////////////////////////
 	    // Initialize HMM.
         int numOfStates = 10;
         int numOfEntities = entity2Id.size();
@@ -93,8 +110,11 @@ public class TempJava {
              System.out.println(learntHmm.toString());
         }
         
-        System.out.println(learntHmm.probability(sequences.get(0)));
-        System.out.println(learntHmm.probability(sequences.get(1)));
+        System.out.println("Probability for 1: "+learntHmm.probability(sequences.get(0)));
+        System.out.println("Probability for 2: "+learntHmm.probability(sequences.get(1)));
+        System.out.println("Probability for 3: "+learntHmm.probability(testSeq.get(0)));
+        System.out.println("Probability for 4: "+learntHmm.probability(testSeq.get(1)));
+        
         System.out.println(learntHmm.getAij(0, 1));
         
         System.out.println("Print in file.");
